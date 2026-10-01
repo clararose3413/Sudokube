@@ -29,7 +29,8 @@ input,textarea{font:inherit;color:var(--fg);background:var(--c);border:1px solid
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
 .card{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--sh);text-align:center}.card b{display:block;font-size:26px;color:var(--ac)}.card small{opacity:.7}
 .ov{position:fixed;inset:0;background:rgba(10,8,30,.7);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9;color:#fff;text-align:center;padding:20px;gap:10px}
-.ov.on{display:flex}#pg{font-size:110px;animation:dn .7s ease-in-out infinite alternate}
+.ov.on{display:flex}#pg{width:min(70vw,280px);height:auto;display:block}#pg.hid{visibility:hidden}#pg:not(.hid){animation:pgin .6s ease-out}
+@keyframes pgin{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
 @keyframes dn{from{transform:rotate(-14deg) translateY(0)}to{transform:rotate(14deg) translateY(-24px)}}
 .p{position:fixed;width:8px;height:8px;border-radius:50%;animation:pf 1s ease-out forwards;pointer-events:none}
 @keyframes pf{to{transform:translate(var(--x),var(--y));opacity:0}}
@@ -43,6 +44,12 @@ h3{margin:18px 0 6px}p{margin:8px 0}svg{width:100%;height:auto;background:var(--
 .f0{background:#5b6cf0}.f1{background:#b15bf0}.f2{background:#fc5c7d}.f3{background:#f5a623}.f4{background:#16b8d8}.f5{background:#8a6d3b}.cf.ok{background:#27c46b}
 .open .hT{transform:translateY(-85px) rotateX(-45deg)}.open .hB{transform:translateY(40px)}
 #pg.pop{animation:dn .7s ease-in-out infinite alternate}
+#pch{position:fixed;left:0;right:0;margin:auto;width:120px;z-index:12;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45)) drop-shadow(0 0 10px rgba(255,214,120,.55));cursor:pointer;opacity:0;font-family:Georgia,'Times New Roman',serif}
+#pch .rl{height:18px;border-radius:9px;background:linear-gradient(#c9a25a,#f1dba2 45%,#b98b45)}
+#pch .pb{height:0;overflow:hidden;margin:-2px 8px;background:linear-gradient(90deg,#e3c98d,#f6e8bd 12%,#f6e8bd 88%,#e3c98d);color:#4a3418;text-align:center}
+#pch .pi{padding:14px 16px 12px;opacity:0;transition:opacity .8s}#pch.rd .pi{opacity:1}
+#pch h4{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:#8a5a1f}
+#pch p{margin:0;font-size:14.5px;line-height:1.45}#pch small{display:block;margin-top:8px;opacity:.55;font-size:11px}
 </style></head><body>
 <header><div class="w"><h1>🧩 Sudoku</h1><p>5 niveaux · statistiques par joueur · grilles à partager</p><button id="who"></button></div></header>
 <main>
@@ -59,7 +66,7 @@ h3{margin:18px 0 6px}p{margin:8px 0}svg{width:100%;height:auto;background:var(--
 <section id="s-st" hidden><div id="st"></div></section>
 <div style="text-align:center;margin-top:24px"><button id="lock" style="opacity:.5">🔒</button></div>
 </main>
-<div class="ov" id="ov"><div id="big" class="scene"></div><div id="pg">🐧</div><h2 id="wm"></h2><button id="again" class="t">Rejouer</button></div>
+<div class="ov" id="ov"><div id="big" class="scene"></div><img id="pg" src="penguins.webp" alt="Pingouins qui dansent"><h2 id="wm"></h2><button id="again" class="t">Rejouer</button></div>
 <div class="ov on" id="lg"><div class="box"><h2 style="margin-top:0">Qui joue ? 👋</h2><p>Choisis ton pseudo : tes statistiques seront gardées et retrouvées à chaque visite.</p><div class="row" id="ch"></div><input id="pn" placeholder="Ton pseudo" maxlength="20"><div class="row"><button id="go" class="t">C'est parti</button></div></div></div>
 <script>
 const $=s=>document.querySelector(s),ce=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
@@ -107,8 +114,8 @@ function win(){fin=1;clearInterval(tm);const t=Math.round((Date.now()-t0)/1e3);
 if(mode=='play'){DB.p[DB.cur].push({n:lb,t,e:er,d:Date.now()});save()}
 $('#ov').classList.add('on');$('#wm').textContent='Bravo ! '+fmt(t)+' · '+er+' erreur'+(er>1?'s':'');fwk();fi=setInterval(fwk,700)}
 function start(q,label,m){mode=m||'play';p=q.slice();v=q.slice();sol=q.slice();if(mode=='play')S(sol,1);nt=Array(81).fill(0);er=0;fin=0;sel=-1;lb=label;t0=0;
-clearInterval(tm);clearInterval(fi);$('#tm').textContent='0:00';$('#tw').hidden=$('#ew').hidden=nb.hidden=mode=='edit';
-$('#ov').classList.remove('on');$('#big').innerHTML='';$('#pg').style.display='';$('#cubebox').hidden=true;$('#lv').hidden=false;$('#pubbox').hidden=mode!='edit';$('#ttl').textContent=label;$('#ms').textContent='';$('#ms').style.color='';show(mode=='edit'?'cr':mode=='cube'?'cu':'play');ui()}
+TT.forEach(clearTimeout);TT=[];document.querySelectorAll('#pch').forEach(e=>e.remove());$('#big').style.opacity='';clearInterval(tm);clearInterval(fi);$('#tm').textContent='0:00';$('#tw').hidden=$('#ew').hidden=nb.hidden=mode=='edit';
+$('#ov').classList.remove('on');$('#big').innerHTML='';$('#pg').classList.remove('hid');$('#cubebox').hidden=true;$('#lv').hidden=false;$('#pubbox').hidden=mode!='edit';$('#ttl').textContent=label;$('#ms').textContent='';$('#ms').style.color='';show(mode=='edit'?'cr':mode=='cube'?'cu':'play');ui()}
 function show(n){const s=n=='st'||n=='li'?n:'play';['play','st','li'].forEach(k=>$('#s-'+k).hidden=k!=s);document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('t',b.dataset.t==n));if(n=='st')stats();if(n=='li')lib()}
 /* ---- Statistiques du joueur ---- */
 function stats(){const a=ST(),o=$('#st');o.innerHTML='';const H=(t,g)=>{const d=ce(g||'p');d.textContent=t;o.append(d);return d};
@@ -164,10 +171,47 @@ setTimeout(()=>{faces=[...Array(6)].map(()=>{const q=gen(LV[L]),s=q.slice();S(s,
 $('#nav').innerHTML='';$('#nav').append(cubeEl());t0=0;$('#ms').textContent='';$('#ms').style.color='';goFace(0)},60)}
 function faceDone(){faces[fc].done=true;nav();if(faces.every(f=>f.done))return openCube();const k=faces.findIndex(f=>!f.done);setTimeout(()=>goFace(k),1100)}
 function openCube(){fin=1;clearInterval(tm);const t=Math.round((Date.now()-t0)/1e3);DB.p[DB.cur].push({n:'Cube '+cubeLv,t,e:er,d:Date.now()});save();
-const g=$('#big'),c=cubeEl();c.style.transform='rotateX(-25deg) rotateY(-35deg)';g.innerHTML='';g.append(c);$('#pg').style.display='none';$('#wm').textContent='';$('#ov').classList.add('on');
-setTimeout(()=>c.classList.add('open'),700);
-setTimeout(()=>{$('#pg').style.display='';$('#wm').textContent='Cube ouvert ! '+fmt(t)+' · '+er+' erreur'+(er>1?'s':'');fwk();fi=setInterval(fwk,700)},1900)}
+const g=$('#big'),c=cubeEl();c.style.transform='rotateX(-25deg) rotateY(-35deg)';g.innerHTML='';g.append(c);$('#pg').classList.add('hid');$('#wm').textContent='';$('#ov').classList.add('on');
+later(()=>c.classList.add('open'),700);later(parchment,1500);
+later(()=>{$('#pg').classList.remove('hid');$('#wm').textContent='Cube ouvert ! '+fmt(t)+' · '+er+' erreur'+(er>1?'s':'');fwk();fi=setInterval(fwk,700)},3600)}
 Object.keys(LV).forEach(k=>{const b=ce('button');b.textContent=k;b.onclick=()=>startCube(k);$('#cl').append(b)});
+/* ---- Parchemin « Le saviez-vous ? » : sort du cube à l'ouverture ---- */
+let TT=[];const later=(f,ms)=>TT.push(setTimeout(f,ms));
+const AN=["Il y a environ 3 000 ans, les ouvriers égyptiens avaient déjà des justificatifs d'absence. Sur un registre de Deir el-Medina, l'un d'eux est noté absent parce qu'il était « en train de boire avec Khonsou ».",
+"Cléopâtre a vécu plus près de l'alunissage d'Apollo 11 (environ 2 000 ans) que de la construction de la Grande Pyramide de Gizeh (environ 2 500 ans).",
+"L'université d'Oxford est plus ancienne que l'Empire aztèque : on y enseignait déjà vers 1096, alors que Tenochtitlan n'a été fondée qu'en 1325.",
+"En 1932, l'armée australienne a envoyé des soldats équipés de mitrailleuses contre des émeus qui ravageaient les cultures. Les oiseaux s'en sont si bien sortis que l'armée a fini par battre en retraite.",
+"En 1838, la France a bloqué les ports du Mexique à cause d'un pâtissier français qui réclamait des dédommagements pour sa boutique pillée. On l'appelle la « guerre des Pâtisseries ».",
+"En 1386, à Falaise, une truie a été jugée, condamnée et exécutée en public pour avoir tué un enfant. Elle avait été habillée en vêtements d'homme pour l'occasion.",
+"En 1522, l'avocat Barthélemy de Chasseneuz a défendu des rats devant un tribunal. Accusés d'avoir mangé des récoltes, ils ne se sont pas présentés : selon lui, les chats rendaient le trajet trop dangereux.",
+"L'empereur romain Vespasien a taxé l'urine, que les teinturiers utilisaient pour traiter les étoffes. À son fils qui s'en moquait, il aurait répondu : « L'argent n'a pas d'odeur. »",
+"Non, les Vikings ne portaient pas de casques à cornes. Cette image vient des costumes d'un opéra de Wagner en 1876, dessinés par Carl Emil Doepler.",
+"En 1698, le tsar Pierre le Grand a créé une taxe sur la barbe. Ceux qui avaient payé recevaient un jeton de cuivre : « La barbe est un fardeau inutile. »",
+"Isaac Newton a dirigé la Monnaie royale anglaise. Il traquait lui-même les faux-monnayeurs, parfois déguisé dans les tavernes, et en a fait condamner un à mort.",
+"En 1896, la guerre entre le Royaume-Uni et Zanzibar a duré entre 38 et 45 minutes selon les sources : c'est la plus courte de l'Histoire.",
+"Charlemagne a peut-être appris à écrire sur le tard : son biographe Éginhard raconte qu'il gardait des tablettes sous son oreiller pour s'entraîner, sans grand succès.",
+"À la cour d'Henri VIII, l'un des postes les plus convoités était celui de « Groom of the Stool » : le gentilhomme qui assistait le roi aux toilettes. Une place très influente.",
+"En 1518, à Strasbourg, des centaines de personnes se sont mises à danser sans pouvoir s'arrêter, pendant des jours. Cette « épidémie de danse » n'a jamais été expliquée avec certitude.",
+"En 1888, un journal a annoncé par erreur la mort d'Alfred Nobel sous le titre « le marchand de la mort est mort ». Choqué, il aurait ensuite créé les prix Nobel.",
+"En Grèce antique, on votait l'exil d'un citoyen en gravant son nom sur un tesson de poterie, un ostrakon. C'est de là que vient le mot « ostracisme ».",
+"En 1919, à Boston, un réservoir a éclaté et libéré plus de 8 millions de litres de mélasse. Une vague sucrée de près de 8 mètres a déferlé dans les rues.",
+"En 1858, la « Grande Puanteur » de Londres a été si terrible que le Parlement a fait tremper ses rideaux dans du chlorure de chaux. Elle a mené à la construction des égouts modernes.",
+"En 1976, la momie de Ramsès II a reçu un passeport égyptien pour venir se faire soigner en France. À la rubrique profession, on a écrit : « roi (décédé) »."];
+function pick(){let u=[];try{u=JSON.parse(localStorage.getItem('sdk-an')||'[]')}catch(_){}
+let l=AN.map((_,i)=>i).filter(i=>!u.includes(i));if(!l.length){u=[];l=AN.map((_,i)=>i)}
+const i=l[Math.random()*l.length|0];u.push(i);try{localStorage.setItem('sdk-an',JSON.stringify(u))}catch(_){}return AN[i]}
+function parchment(){const r=$('#big').getBoundingClientRect(),cy=r.top+r.height/2,W=Math.min(innerWidth-32,330),e=ce('div');e.id='pch';
+e.innerHTML='<div class="rl"></div><div class="pb"><div class="pi"><h4>LE SAVIEZ-VOUS ?</h4><p></p><small>touche pour refermer</small></div></div><div class="rl"></div>';
+e.querySelector('p').textContent=pick();document.body.append(e);
+const pb=e.querySelector('.pb');e.style.width=W+'px';pb.style.height='auto';const bh=pb.offsetHeight;pb.style.height='0';e.style.width='120px';
+const ty=Math.max(10,cy-(bh+32)/2),y1=cy-130;e.style.top=(cy-18)+'px';
+const a1=e.animate([{opacity:0,top:(cy-18)+'px',transform:'scale(.5) rotate(-10deg)'},{opacity:1,top:y1+'px',transform:'scale(1) rotate(-5deg)'}],{duration:1100,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'});
+a1.onfinish=()=>{e.style.opacity=1;e.style.top=y1+'px';e.style.transform='rotate(-5deg)';a1.cancel();
+$('#big').style.transition='opacity 1s';$('#big').style.opacity=.25;
+const o={duration:1100,easing:'ease-in-out',fill:'forwards'};
+e.animate([{width:'120px',top:y1+'px',transform:'rotate(-5deg)'},{width:W+'px',top:ty+'px',transform:'rotate(0deg)'}],o);
+pb.animate([{height:'0px'},{height:bh+'px'}],o).onfinish=()=>e.classList.add('rd')};
+e.onclick=()=>e.animate([{opacity:1},{opacity:0}],{duration:350,fill:'forwards'}).onfinish=()=>e.remove()}
 /* ---- Branchements ---- */
 Object.keys(LV).forEach(k=>{const b=ce('button');b.textContent=k;b.onclick=()=>start(gen(LV[k]),k);$('#lv').append(b)});
 const np=$('#np');for(let d=1;d<10;d++){const b=ce('button');b.textContent=d;b.onclick=()=>put(d);np.append(b)}
